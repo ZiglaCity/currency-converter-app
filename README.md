@@ -1,5 +1,5 @@
 DESCRIPTION
-This is a desktop application for converting all sorts of currencies
+This is a desktop application for converting all sorts of currencies with an inbuilt calculator.
 
 TOOLS USED
 Built fuilly in python using tkinter for the UI. And extracting exchange rates from an API
