@@ -19,3 +19,47 @@ def check_connection():
 
     # Call this function periodically (e.g., every 5 seconds)
     root.after(5000, check_connection)
+
+
+
+#create a function which updates the exchange rate when necessary
+api_url = "https://api.exchangerate-api.com/v4/latest/USD" 
+json_file_path = "exchange_rates.json"
+
+def update_exchange_rate(api_url, json_file_path):
+    check_connection()
+    try:
+        # Fetch the current exchange rates from the API
+        response = requests.get(api_url, timeout=5)
+        response.raise_for_status()  # Raise an error if the request was unsuccessful
+        
+        # Parse the JSON response
+        api_response = response.json()
+        
+        # Extract the exchange rates from the 'rates' key
+        exchange_rates = api_response.get('rates', {})
+        
+        try:
+            # Attempt to save the new exchange rates to the JSON file
+            with open(json_file_path, 'w') as json_file:
+                global exchange_rate_offline_data
+                json.dump(exchange_rates, json_file, indent=4)
+                exchange_rate_offline_data = exchange_rates
+                #print(f"Exchange rates successfully saved to {json_file_path}")
+        
+        except PermissionError as e:
+            # Optionally, try saving to a different location or take alternative action
+            fallback_path = os.path.join(os.path.expanduser("~"), "Documents", os.path.basename(json_file_path))
+            try:
+                with open(fallback_path, 'w') as json_file:
+                    json.dump(exchange_rates, json_file, indent=4)
+                    exchange_rate_offline_data = exchange_rates
+                #print(f"Exchange rates successfully saved to {fallback_path}")
+            except Exception as fallback_error:
+                #do nothing
+                rates = rates
+        
+    except requests.RequestException as e:
+        return False
+        #print(f"Failed to fetch the exchange rates: {e}")
+
