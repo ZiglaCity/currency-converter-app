@@ -134,4 +134,9 @@ def convert_currency():
 
     return converted_amount
 
+def Refresh():
+    update_exchange_rate()
+    return 
+
+
 
