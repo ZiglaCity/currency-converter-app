@@ -55,7 +55,7 @@ def update_exchange_rate(api_url, json_file_path):
                 global exchange_rate_offline_data
                 json.dump(exchange_rates, json_file, indent=4)
                 exchange_rate_offline_data = exchange_rates
-                print(exchange_rates)
+                # print(exchange_rates)
                 print(f"Exchange rates successfully saved to {json_file_path}")
         
         except PermissionError as e:
@@ -65,14 +65,21 @@ def update_exchange_rate(api_url, json_file_path):
                 with open(fallback_path, 'w') as json_file:
                     json.dump(exchange_rates, json_file, indent=4)
                     exchange_rate_offline_data = exchange_rates
-                    print("Exchange rate sent to Documents instead")
+                    # print("Exchange rate sent to Documents instead")
             except Exception as fallback_error:
-                print(fallback_error)
-                #do nothing
+                # print(fallback_error)
                 rates = rates
         
     except requests.RequestException as e:
-        print(e)
-        return False
+        # print(e)
+        # extract the exchange rate from the cache file if user is offline
+        try:
+            with open(app_cache_path, 'r') as file:
+                offline_rate = file.read()
+                if offline_rate:
+                    exchange_rate_offline_data = offline_rate
+                    print(f"this is the offline exchange rate {exchange_rate_offline_data}")
+        except FileNotFoundError:
+            print("File Not Found")
 
 update_exchange_rate(api_url, json_file_path)
