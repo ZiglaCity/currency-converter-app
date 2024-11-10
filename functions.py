@@ -191,4 +191,14 @@ def swap_currencies():
         converted_amount = convert_currency()
         
 
-
+#a function that appends the text value of the buttons to the entry field
+def on_button_click(button_text, entry_top):
+    # Get the current content of the entry
+    current_text = entry_top.get()
+    
+    # Append the text of the clicked button
+    new_text = current_text + button_text
+    
+    # Update the entry with the new text
+    entry_top.delete(0, tk.END)
+    entry_top.insert(0, new_text)
