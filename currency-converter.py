@@ -268,7 +268,7 @@ def convert_currency():
 
 
 #use the various APIS to fetch the various currncies and country names and create a dictionary matching them
-#since i have already run this function and generated the countries and capitals, not not really nededed in the program again, but it looks cool to me so i'll keep it here for later refrences
+#since i have already run this function and generated the countries and capitals, its not really nededed in the program again, but for references so i'll keep it here for later refrences
 def fetch_countries_and_currencies():
     # Fetch currencies and exchange rates
     exchange_api_url = "https://api.exchangerate-api.com/v4/latest/USD"
