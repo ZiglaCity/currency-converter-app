@@ -28,15 +28,14 @@ from appdirs import user_cache_dir
 #create a function which updates the exchange rate when necessary
 api_url = "https://api.exchangerate-api.com/v4/latest/USD" 
 json_file_path = "exchange_rates.json"
+app_name = "Currency Converter"
+app_author = "ZiglaCity"
+cache_dir = user_cache_dir(app_name,app_author)
+os.makedirs(cache_dir, exist_ok=True)
 
-def update_exchange_rate(api_url, json_file_path):
-    app_name = "Currency Converter"
-    app_author = "ZiglaCity"
-    cache_dir = user_cache_dir(app_name,app_author)
-    os.makedirs(cache_dir, exist_ok=True)
-    
-    app_cache_path = os.path.join(cache_dir, json_file_path)
+app_cache_path = os.path.join(cache_dir, json_file_path)
 
+def update_exchange_rate():
 
     try:
         # Fetch the current exchange rates from the API
@@ -78,8 +77,9 @@ def update_exchange_rate(api_url, json_file_path):
                 offline_rate = file.read()
                 if offline_rate:
                     exchange_rate_offline_data = offline_rate
-                    print(f"this is the offline exchange rate {exchange_rate_offline_data}")
-        except FileNotFoundError:
-            print("File Not Found")
+                    print(f"No Connction so this is the offline exchange rate {exchange_rate_offline_data}")
+        except (FileNotFoundError, PermissionError, IsADirectoryError, OSError):
+            print("No Connection and File Not Found")
+            return
 
-update_exchange_rate(api_url, json_file_path)
+update_exchange_rate()
