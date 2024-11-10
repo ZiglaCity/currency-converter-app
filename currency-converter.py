@@ -277,7 +277,6 @@ def fetch_countries_and_currencies():
     usd_currencies = exchange_data['rates']
 
     # Fetch country names and their currency codes
-    #but since we cannot always be fetching the country data from an API, we will save the data and open a file instead of fetching the data online
     country_api_url = "https://restcountries.com/v3.1/all"
     country_response = requests.get(country_api_url)
     country_data = country_response.json()
@@ -383,6 +382,7 @@ def create_gui():
     global root,status,status_label, answer, convert_from, convert_to, entry_top, entry_bottom
     root = tk.Tk()
     root.title("Currency Converter")
+    root.iconbitmap('icon.ico')
     root.geometry(f"{fixed_width}x{fixed_height}")
     root.resizable(False, False)  # Prevent resizing and maximizing
 
