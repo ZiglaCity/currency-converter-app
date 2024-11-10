@@ -1,0 +1,2 @@
+1. find a solution to displaying the icon at the windows title even when the user runs the app at different locations
+
