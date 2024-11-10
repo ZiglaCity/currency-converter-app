@@ -148,5 +148,12 @@ def search():
             listbox.insert(tk.END, f"{value}:   {key}")  # Insert using the desired format
  
 
+#define functions for the buttons in the calculor phase
+def clear_all():
+    entry_top.delete(0, tk.END)
+    entry_bottom.config(state='normal')
+    entry_bottom.delete(0, tk.END)
+    entry_bottom.config(state='readonly')
+
 
 
