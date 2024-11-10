@@ -139,13 +139,13 @@ def Refresh():
     return 
 
 
-#define a funcion to seach for a particulatar country or currency
+#define a f#define a funcion to seach for a particulatar country or currency
 def search():
     query = search_entry.get().lower()
-    listbox.delete(0, tk.END)  # Clear existing items in the Listbox
-    for key, value in data.items():
-        if query in value.lower() or query in key.lower():  # Case-insensitive search
-            listbox.insert(tk.END, f"{value}:   {key}")  # Insert using the desired format
+    listbox.delete(0, tk.END)  # Clear existing items in the Listbox    
+    for currency in currency_data:
+        if query in " ".join(currency_data[currency][0:]).lower() or query in currency.lower():  # Case-insensitive search
+            listbox.insert(tk.END, f"{" ".join(currency_data[currency][0:])}: {currency}")
  
 
 #define functions for the buttons in the calculor phase
