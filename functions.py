@@ -163,5 +163,32 @@ def delete_last():
         entry_top.delete(len(current_text) - 1, tk.END)
 
 
+# A function that swaps both currencies
+def swap_currencies():
+    global top, down, from_, to_, amount, entry_bottom
+    # Get the amount in the entry_from box
+    top = entry_top.get()
+    down = entry_bottom.get()
+
+    #delete the button entry where the converted amount will be inputed to fix the new value
+    entry_bottom.config(state= 'normal')
+    entry_bottom.delete(0, tk.END)
+    entry_bottom.config(state= 'readonly')
+
+    from_ , to_ = to_, from_
+    
+
+    from_curr = convert_from.get()
+    to_curr = convert_to.get()
+    convert_from.set(to_curr)
+    convert_to.set(from_curr)
+
+    amount = top
+
+        
+    if amount:
+        # Convert the amount based on the new currencies
+        converted_amount = convert_currency()
+        
 
 
