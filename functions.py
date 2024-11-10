@@ -202,3 +202,32 @@ def on_button_click(button_text, entry_top):
     # Update the entry with the new text
     entry_top.delete(0, tk.END)
     entry_top.insert(0, new_text)
+
+
+# A function that evaluated the expression when the user clicks equal to
+def evaluate_expression(entry_top):
+    # Get the current content of the entry
+    expression = entry_top.get()
+
+    #delete the button entry where the converted amount will be inputed to fix the new value
+    entry_bottom.config(state= 'normal')
+    entry_bottom.delete(0, tk.END)
+    entry_bottom.config(state= 'readonly')
+    
+    try:
+        # Evaluate the expression
+        result = eval(expression)
+        # Update the entry with the result
+        entry_top.delete(0, tk.END)
+        entry_top.insert(0, str(result))
+        
+        #after calculating lets convert to the corresponding to currency        
+        if result:
+            # Convert the amount based on the new currencies
+            convert_currency()
+
+    except Exception as e:
+        # Handle any errors (e.g., invalid expression)
+        entry_top.delete(0, tk.END)
+        entry_top.insert(0, "Error")
+
