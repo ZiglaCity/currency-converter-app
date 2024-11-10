@@ -384,7 +384,7 @@ def create_gui():
     root.title("Currency Converter")
     root.iconbitmap('icon.ico')
     root.geometry(f"{fixed_width}x{fixed_height}")
-    root.resizable(False, False)  # Prevent resizing and maximizing
+    root.resizable(False, False)
 
 
     label = tk.Label(root, text="ZIGLA'S CURRENCY CONVERTER")
