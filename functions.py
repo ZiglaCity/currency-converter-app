@@ -3,25 +3,25 @@ import json
 import os 
 from appdirs import user_cache_dir
 
-#create a new function much convinient to check repeated when the user is either online or offline
-# def check_connection():
-#     global status_label, root
-#     try:
-#         # Make a request to a reliable site (like Google's DNS)
-#         response = requests.get('https://www.google.com', timeout=3)
-#         response.raise_for_status()
+create a new function much convinient to check repeated when the user is either online or offline
+def check_connection():
+    global status_label, root
+    try:
+        # Make a request to a reliable site (like Google's DNS)
+        response = requests.get('https://www.google.com', timeout=3)
+        response.raise_for_status()
 
-#         if response.status_code == 200:
-#             status_label.config(text="Online", fg="green")
+        if response.status_code == 200:
+            status_label.config(text="Online", fg="green")
                     
-#         else:
-#             status_label.config(text="Offline", fg="red")
+        else:
+            status_label.config(text="Offline", fg="red")
 
-#     except requests.exceptions.RequestException:
-#         status_label.config(text="Offline", fg="red")
+    except requests.exceptions.RequestException:
+        status_label.config(text="Offline", fg="red")
 
-#     # Call this function periodically (e.g., every 5 seconds)
-#     root.after(5000, check_connection)
+    # Call this function periodically (e.g., every 5 seconds)
+    root.after(5000, check_connection)
 
 
 
@@ -137,6 +137,16 @@ def convert_currency():
 def Refresh():
     update_exchange_rate()
     return 
+
+
+#define a funcion to seach for a particulatar country or currency
+def search():
+    query = search_entry.get().lower()
+    listbox.delete(0, tk.END)  # Clear existing items in the Listbox
+    for key, value in data.items():
+        if query in value.lower() or query in key.lower():  # Case-insensitive search
+            listbox.insert(tk.END, f"{value}:   {key}")  # Insert using the desired format
+ 
 
 
 
