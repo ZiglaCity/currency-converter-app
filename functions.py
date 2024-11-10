@@ -156,4 +156,12 @@ def clear_all():
     entry_bottom.config(state='readonly')
 
 
+# A function that deletes last character
+def delete_last():
+    current_text = entry_top.get()
+    if current_text:
+        entry_top.delete(len(current_text) - 1, tk.END)
+
+
+
 
