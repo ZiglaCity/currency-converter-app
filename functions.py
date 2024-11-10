@@ -148,6 +148,7 @@ def search():
             listbox.insert(tk.END, f"{" ".join(currency_data[currency][0:])}: {currency}")
  
 
+
 #define functions for the buttons in the calculor phase
 def clear_all():
     entry_top.delete(0, tk.END)

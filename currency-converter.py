@@ -1,6 +1,7 @@
 import requests
 import tkinter as tk
 import json
+import sys
 import os
 from appdirs import user_cache_dir
 
@@ -382,7 +383,19 @@ def create_gui():
     global root,status,status_label, answer, convert_from, convert_to, entry_top, entry_bottom
     root = tk.Tk()
     root.title("Currency Converter")
-    root.iconbitmap('icon.ico')
+
+    # setting relative path for icon
+    # def resource_path(relative_path):
+    #     try:
+    #         base_path = sys._MEIPASS
+    #     except Exception:
+    #         base_path = os.path.abspath(".")
+    #     return os.path.join(base_path, relative_path)
+
+    # root.iconbitmap(resource_path('icon.ico'))
+
+    # windows title icon not working
+    
     root.geometry(f"{fixed_width}x{fixed_height}")
     root.resizable(False, False)
 

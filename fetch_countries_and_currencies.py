@@ -1,6 +1,5 @@
 import requests
 
-
 def fetch_countries_and_currencies():
     exchange_api_url = "https://api.exchangerate-api.com/v4/latest/USD"
     exchange_response = requests.get(exchange_api_url)
