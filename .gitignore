@@ -6,3 +6,9 @@
 
 # ignore the exe file
 dist/
+
+# ignore all my data extraction and functions
+data.py
+functions.py
+fetch_countries_and_currencies.py
+theme.py
