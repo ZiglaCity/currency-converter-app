@@ -1,7 +1,6 @@
 import requests
 import tkinter as tk
 import json
-import sys
 import os
 from appdirs import user_cache_dir
 
@@ -32,7 +31,7 @@ status = "OFFLINE"
 fixed_width = 580
 fixed_height =  720
 
-# setting up the app cache directory where exchange rate can be stored
+# setting up the app cache directory where latest exchange rates would be stored and fetched
 api_url = "https://api.exchangerate-api.com/v4/latest/USD" 
 json_file_path = "exchange_rates.json"
 app_name = "Currency Converter"
@@ -103,34 +102,32 @@ entry_style = {
     "bd": 2,
     "relief": "solid"
 }
-#DAA520
+
 frame_style = {
     "bg": "#e0e0e0",
     "bd": 2,
     "relief": "sunken"
 }
 listbox_style = {
-    'bg': '#f0f0f0',         # Background color
-    'fg': '#333333',         # Text color
-    'font': ('Arial', 12),   # Font type and size
-    'highlightbackground': '#cccccc',  # Border color when the listbox is not in focus
-    'highlightthickness': 1, # Border thickness
-    'selectbackground': '#0078d4',  # Background color when an item is selected
-    'selectforeground': '#ffffff',  # Text color when an item is selected
-    'width': 100,             # Width of the listbox (number of characters)
-    'height': 15  # Number of visible lines
+    'bg': '#f0f0f0',        
+    'fg': '#333333',         
+    'font': ('Arial', 12),  
+    'highlightbackground': '#cccccc', 
+    'highlightthickness': 1, 
+    'selectbackground': '#0078d4',
+    'selectforeground': '#ffffff',
+    'width': 100,    
+    'height': 15
 }
 scrollbar_style = {
-    'bg': '#dddddd',         # Background color of the scrollbar
-    'troughcolor': '#cccccc',# Color of the trough (the area the slider moves within)
-    'width': 15              # Width of the scrollbar
+    'bg': '#dddddd',      
+    'troughcolor': '#cccccc',
+    'width': 15  
 }
 
 
 
-#define a funciton which applies the styles to their respective widgets
 def apply_styles(widget):
-    #Apply styles to all Button, Label, Entry, and Frame widgets
     if isinstance(widget, tk.Button):
         widget.config(**button_style)
     elif isinstance(widget, tk.Label):
@@ -144,41 +141,34 @@ def apply_styles(widget):
     elif isinstance(widget, tk.Scrollbar):
         widget.config(**scrollbar_style)
 
-    # Recursively apply styles to all children
     for child in widget.winfo_children():
         apply_styles(child)
 
 
 
-#create a function which updates the exchange rate when necessary
 api_url = "https://api.exchangerate-api.com/v4/latest/USD" 
 json_file_path = "exchange_rates.json"
 
 def update_exchange_rate():
 
     try:
-        # Fetch the current exchange rates from the API
         response = requests.get(api_url, timeout=5)
         response.raise_for_status()
         api_response = response.json()
         exchange_rates = api_response.get('rates', {})
         
         try:
-            # Attempt to save the new exchange rates to the JSON file in the app cache folder
             with open(app_cache_path, 'w') as json_file:
                 global exchange_rate_offline_data
                 json.dump(exchange_rates, json_file, indent=4)
                 exchange_rate_offline_data = exchange_rates
-                # print(f"Exchange rates successfully saved to {json_file_path}")
         
         except PermissionError as e:
-        # Optionally, try saving to a different location or take alternative action
             fallback_path = os.path.join(os.path.expanduser("~"), "Documents", os.path.basename(json_file_path))
             try:
                 with open(fallback_path, 'w') as json_file:
                     json.dump(exchange_rates, json_file, indent=4)
                     exchange_rate_offline_data = exchange_rates
-                    # print("Exchange rate sent to Documents instead")
             except Exception as fallback_error:
                 rates = rates
         
@@ -188,21 +178,16 @@ def update_exchange_rate():
                 offline_rate = json.load(file)
                 if offline_rate:
                     exchange_rate_offline_data = offline_rate
-                    # print(f"No Connction so this is the offline exchange rate {exchange_rate_offline_data}")
         except (FileNotFoundError, PermissionError, IsADirectoryError, OSError):
-            # print("No Connection and File Not Found")
             return
 
  
 def Refresh():
     update_exchange_rate()
-    return 
 
-#create a new function much convinient to check repeated when the user is either online or offline
 def check_connection():
     global status_label
     try:
-        # Make a request to a reliable site (like Google's DNS)
         response = requests.get('https://www.google.com', timeout=3)
         response.raise_for_status()
 
@@ -215,12 +200,9 @@ def check_connection():
     except requests.exceptions.RequestException:
         status_label.config(text="Offline", fg="red")
 
-    # Call this function periodically (e.g., every 5 seconds)
     root.after(5000, check_connection)
 
 
-
-#define a function to convert the curries appropriately
 def convert_currency():
     global entry_top, to_currency,answer, exchange_rate_offline_data, from_currency, entry_bottom, answer, app_cache_path 
     if not entry_top.get():
@@ -230,22 +212,17 @@ def convert_currency():
     to_currency = to_
     from_currency = from_
 
-    #fetch the latest rates
     try:
         with open(app_cache_path, 'r') as file:
             offline_rate = json.load(file)
             if offline_rate:
                 rates = offline_rate
                 exchange_rate_offline_data = rates
-                # print(f"this is the offline exchange rate {exchange_rate_offline_data}")
             else:
-                # print("File Empty")
                 rates = exchange_rate_offline_data
     except (FileNotFoundError, PermissionError, IsADirectoryError, OSError):
-        # print("File Not Found while converting")
         rates = exchange_rate_offline_data
 
-    #do the convertion
     if from_currency == "USD":
         converted_amount = float(amount) * float(rates[to_currency])
         
@@ -253,7 +230,6 @@ def convert_currency():
         converted_amount = float(amount) / float(rates[from_currency]) * float(rates[to_currency])
         entry_bottom.config(state="normal")
         
-    #round the converted value to an appropriate decimal places
     if converted_amount > 1:
         converted_amount = round(converted_amount, 2)
     elif converted_amount > 0.01:
@@ -261,15 +237,12 @@ def convert_currency():
     else:
         converted_amount = round(converted_amount, 5)
 
-    #now fix the anser in the down entry and change its mode to read only
     answer.set(converted_amount)
     entry_bottom.config(state="readonly")
 
     return converted_amount
 
 
-#use the various APIS to fetch the various currncies and country names and create a dictionary matching them
-#since i have already run this function and generated the countries and capitals, its not really nededed in the program again, but for references so i'll keep it here for later refrences
 def fetch_countries_and_currencies():
     # Fetch currencies and exchange rates
     exchange_api_url = "https://api.exchangerate-api.com/v4/latest/USD"
@@ -293,16 +266,14 @@ def fetch_countries_and_currencies():
     return currency_to_country
 
 
-#define a funcion to seach for a particulatar country or currency
 def search():
     query = search_entry.get().lower()
-    listbox.delete(0, tk.END)  # Clear existing items in the Listbox    
+    listbox.delete(0, tk.END)     
     for currency in currency_data:
-        if query in " ".join(currency_data[currency][0:]).lower() or query in currency.lower():  # Case-insensitive search
+        if query in " ".join(currency_data[currency][0:]).lower() or query in currency.lower():
             listbox.insert(tk.END, f"{" ".join(currency_data[currency][0:])}: {currency}")
     
 
-#define functions for the buttons in the calculor phase
 def clear_all():
     entry_top.delete(0, tk.END)
     entry_bottom.config(state='normal')
@@ -310,21 +281,17 @@ def clear_all():
     entry_bottom.config(state='readonly')
 
 
-# A function that deletes last character
 def delete_last():
     current_text = entry_top.get()
     if current_text:
         entry_top.delete(len(current_text) - 1, tk.END)
 
 
-# A function that swaps both currencies
 def swap_currencies():
     global top, down, from_, to_, amount, entry_bottom
-    # Get the amount in the entry_from box
     top = entry_top.get()
     down = entry_bottom.get()
 
-    #delete the button entry where the converted amount will be inputed to fix the new value
     entry_bottom.config(state= 'normal')
     entry_bottom.delete(0, tk.END)
     entry_bottom.config(state= 'readonly')
@@ -339,12 +306,10 @@ def swap_currencies():
     amount = top
 
     if amount:
-        # Convert the amount based on the new currencies
         convert_currency()
         
 
 
-#a function that appends the text value of the buttons to the entry field
 def on_button_click(button_text, entry_top):
     current_text = entry_top.get()
     new_text = current_text + button_text
@@ -352,7 +317,6 @@ def on_button_click(button_text, entry_top):
     entry_top.insert(0, new_text)
 
 
-# A function that evaluated the expression when the user clicks equal to
 def evaluate_expression(entry_top):
     expression = entry_top.get()
 
@@ -361,10 +325,8 @@ def evaluate_expression(entry_top):
     entry_bottom.config(state= 'readonly')
     
     try:
-        # Evaluate the expression
         result = eval(expression)
         print(result)
-        # Update the entry with the result
         entry_top.delete(0, tk.END)
         entry_top.insert(0, (result))
         
@@ -372,7 +334,6 @@ def evaluate_expression(entry_top):
             convert_currency()
 
     except Exception as e:
-        # Handle any errors (e.g., invalid expression)
         entry_top.delete(0, tk.END)
         entry_top.insert(0, "Error")
     
@@ -384,17 +345,17 @@ def create_gui():
     root = tk.Tk()
     root.title("Currency Converter")
 
-    # setting relative path for icon
-    # def resource_path(relative_path):
-    #     try:
-    #         base_path = sys._MEIPASS
-    #     except Exception:
-    #         base_path = os.path.abspath(".")
-    #     return os.path.join(base_path, relative_path)
+    """ setting relative path for icon
+    def resource_path(relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+        return os.path.join(base_path, relative_path)
 
-    # root.iconbitmap(resource_path('icon.ico'))
+    root.iconbitmap(resource_path('icon.ico'))
 
-    # windows title icon not working
+    windows title icon not working """
     
     root.geometry(f"{fixed_width}x{fixed_height}")
     root.resizable(False, False)
@@ -410,14 +371,12 @@ def create_gui():
     status_label = tk.Label(mode_frame, text="Checking...", font=('Helvetica', 12))
     status_label.pack(side="left")
 
-    # # Start checking the connection
     check_connection()
 
     refresh_button = tk.Button(mode_frame, text="REFRESH", command=Refresh)
     refresh_button.pack(side='right')
 
 
-    # Create a Frame to hold the entries, labels, and buttons
     frame = tk.Frame(root, padx=10, pady=10)
     frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
@@ -427,31 +386,26 @@ def create_gui():
     convert_from.set(from_)
     convert_to.set(to_)
 
-    # Create and place the label, button, and entry for the top entry
     label_top = tk.Label(frame, text="CONVERT FROM:")
-    label_top.grid(row=0, column=0, padx=5, pady=5, sticky="e")  # Label at (0, 0)
+    label_top.grid(row=0, column=0, padx=5, pady=5, sticky="e") 
     button_top = tk.Button(frame, textvariable=convert_from, command= to_convert_from)
-    button_top.grid(row=0, column=1, padx=5, pady=5)  # Button at (0, 1)
+    button_top.grid(row=0, column=1, padx=5, pady=5)
     entry_top = tk.Entry(frame, width=30)
-    entry_top.grid(row=0, column=2, padx=5, pady=5)  # Entry at (0, 2)
+    entry_top.grid(row=0, column=2, padx=5, pady=5) 
 
-    # Create and place the label, button, and entry for the bottom entry
     label_bottom = tk.Label(frame, text="CONVERT TO:")
-    label_bottom.grid(row=1, column=0, padx=5, pady=5, sticky="e")  # Label at (1, 0)
+    label_bottom.grid(row=1, column=0, padx=5, pady=5, sticky="e")
     button_bottom = tk.Button(frame, textvariable=convert_to, command=to_convert_to)
-    button_bottom.grid(row=1, column=1, padx=5, pady=5)  # Button at (1, 1)
+    button_bottom.grid(row=1, column=1, padx=5, pady=5)
     entry_bottom = tk.Entry(frame, width=30, textvariable=answer, state="readonly")
-    entry_bottom.grid(row=1, column=2, padx=5, pady=5)  # Entry at (1, 2)
+    entry_bottom.grid(row=1, column=2, padx=5, pady=5)
 
-    #create a button to convert
     convert_button = tk.Button(frame, text="CONVERT", command=convert_currency)
     convert_button.grid(row=3, column=2, padx=5, pady=5)
 
-    # Create the bottom frame to hold the grid of buttons
     bottom_frame = tk.Frame(root, padx=10, pady=10)
     bottom_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-    # Create and place buttons in the bottom frame (4 columns x 5 rows) with individual commands
     clear_button = tk.Button(bottom_frame, text="CLEAR", width=10, height=2, command=clear_all)
     clear_button.grid(row=0, column=0, padx=5, pady=5)
 
@@ -464,7 +418,6 @@ def create_gui():
     divide_button = tk.Button(bottom_frame, text="/", width=10, height=2, command=lambda: on_button_click("/", entry_top))
     divide_button.grid(row=0, column=3, padx=5, pady=5)
 
-    # Repeat for other buttons, adjusting the row and column as needed
     button7 = tk.Button(bottom_frame, text="7", width=10, height=2, command=lambda: on_button_click("7", entry_top))
     button7.grid(row=1, column=0, padx=5, pady=5)
 
@@ -501,7 +454,6 @@ def create_gui():
     add_button = tk.Button(bottom_frame, text="+", width=10, height=2, command=lambda: on_button_click("+", entry_top))
     add_button.grid(row=3, column=3, padx=5, pady=5)
 
-    # Repeat for other buttons, adjusting the row and column as needed
     dot_button = tk.Button(bottom_frame, text=".", width=10, height=2, command=lambda: on_button_click(".", entry_top))
     dot_button.grid(row=4, column=0, padx=5, pady=5)
 
@@ -514,7 +466,6 @@ def create_gui():
     equal_button = tk.Button(bottom_frame, text="=", width=10, height=2, command=lambda: evaluate_expression(entry_top))
     equal_button.grid(row=4, column=3, padx=5, pady=5)
 
-    # Configure the frame's grid to center the widgets
     for i in range(5):
         bottom_frame.grid_rowconfigure(i, weight=1)
 
@@ -529,7 +480,6 @@ def create_gui():
 
     
 def back_to_main_phase():
-     # Destroy all widgets in the root window
     for widget in root.winfo_children():
         widget.destroy()
 
@@ -553,7 +503,6 @@ def back_to_main_phase():
     refresh_button.pack(side='right')
 
 
-    # Create a Frame to hold the entries, labels, and buttons
     frame = tk.Frame(root, padx=10, pady=10)
     frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
@@ -563,31 +512,26 @@ def back_to_main_phase():
     convert_from.set(from_)
     convert_to.set(to_)
 
-    # Create and place the label, button, and entry for the top entry
     label_top = tk.Label(frame, text="CONVERT FROM:")
-    label_top.grid(row=0, column=0, padx=5, pady=5, sticky="e")  # Label at (0, 0)
+    label_top.grid(row=0, column=0, padx=5, pady=5, sticky="e")
     button_top = tk.Button(frame, textvariable=convert_from, command= to_convert_from)
-    button_top.grid(row=0, column=1, padx=5, pady=5)  # Button at (0, 1)
+    button_top.grid(row=0, column=1, padx=5, pady=5) 
     entry_top = tk.Entry(frame, width=30)
-    entry_top.grid(row=0, column=2, padx=5, pady=5)  # Entry at (0, 2)
+    entry_top.grid(row=0, column=2, padx=5, pady=5)
 
-    # Create and place the label, button, and entry for the bottom entry
     label_bottom = tk.Label(frame, text="CONVERT TO:")
-    label_bottom.grid(row=1, column=0, padx=5, pady=5, sticky="e")  # Label at (1, 0)
+    label_bottom.grid(row=1, column=0, padx=5, pady=5, sticky="e") 
     button_bottom = tk.Button(frame, textvariable=convert_to, command=to_convert_to)
-    button_bottom.grid(row=1, column=1, padx=5, pady=5)  # Button at (1, 1)
+    button_bottom.grid(row=1, column=1, padx=5, pady=5)
     entry_bottom = tk.Entry(frame, width=30, textvariable=answer, state="readonly")
-    entry_bottom.grid(row=1, column=2, padx=5, pady=5)  # Entry at (1, 2)
+    entry_bottom.grid(row=1, column=2, padx=5, pady=5)
 
-    #create a button to convert
     convert_button = tk.Button(frame, text="CONVERT", command=convert_currency)
     convert_button.grid(row=3, column=2, padx=5, pady=5)
 
-    # Create the bottom frame to hold the grid of buttons
     bottom_frame = tk.Frame(root, padx=10, pady=10)
     bottom_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-    # Create and place buttons in the bottom frame (4 columns x 5 rows) with individual commands
     clear_button = tk.Button(bottom_frame, text="CLEAR", width=10, height=2, command=clear_all)
     clear_button.grid(row=0, column=0, padx=5, pady=5)
 
@@ -600,7 +544,6 @@ def back_to_main_phase():
     divide_button = tk.Button(bottom_frame, text="/", width=10, height=2, command=lambda: on_button_click("/", entry_top))
     divide_button.grid(row=0, column=3, padx=5, pady=5)
 
-    # Repeat for other buttons, adjusting the row and column as needed
     button7 = tk.Button(bottom_frame, text="7", width=10, height=2, command=lambda: on_button_click("7", entry_top))
     button7.grid(row=1, column=0, padx=5, pady=5)
 
@@ -637,7 +580,6 @@ def back_to_main_phase():
     add_button = tk.Button(bottom_frame, text="+", width=10, height=2, command=lambda: on_button_click("+", entry_top))
     add_button.grid(row=3, column=3, padx=5, pady=5)
 
-    # Repeat for other buttons, adjusting the row and column as needed
     dot_button = tk.Button(bottom_frame, text=".", width=10, height=2, command=lambda: on_button_click(".", entry_top))
     dot_button.grid(row=4, column=0, padx=5, pady=5)
 
@@ -650,11 +592,10 @@ def back_to_main_phase():
     equal_button = tk.Button(bottom_frame, text="=", width=10, height=2, command=lambda: evaluate_expression(entry_top))
     equal_button.grid(row=4, column=3, padx=5, pady=5)
 
-    # Configure the frame's grid to center the widgets
-    for i in range(5):  # 5 rows
+    for i in range(5):
         bottom_frame.grid_rowconfigure(i, weight=1)
 
-    for j in range(4):  # 4 columns
+    for j in range(4):
         bottom_frame.grid_columnconfigure(j, weight=1)
 
     apply_styles(root)
@@ -665,15 +606,12 @@ def back_to_main_phase():
 
 
 
-#create a duplicate of the show currency phase so that we handle different event in different button clicks
 def to_convert_from():
-    # Destroy all widgets in the root window
     for widget in root.winfo_children():
         widget.destroy()
 
     global search_entry, search_button, listbox_frame, listbox, item_key, from_, to_
 
-    # Create a title label
     title_label = tk.Label(root, text="Countries and Currencies", font=("Arial", 16))
     title_label.pack(pady=2)
 
@@ -683,37 +621,31 @@ def to_convert_from():
     search_button = tk.Button(root, text="SEARCH", command=search)
     search_button.pack(pady=1)
 
-    # Create a new frame for the currency phase
     currency_frame = tk.Frame(root, padx=10, pady=10)
     currency_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-    # Create a canvas and scrollbar for scrolling
     canvas = tk.Canvas(currency_frame)
     canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-    # Create a frame inside the canvas to hold the listbox
     listbox_frame = tk.Frame(canvas)
     listbox_frame.pack(pady=10)
 
-    # Create a scrollbar
     scrollbar = tk.Scrollbar(listbox_frame)
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
 
-    # Function to display key-value pairs
     def show_details(event):
         global item_key, from_, to_
         selection = listbox.curselection()
         if selection:
             index = selection[0]
-            item_display = listbox.get(index).strip()  # Get the displayed string
-            item = item_display.split()  # Extract value and key from displayed string
+            item_display = listbox.get(index).strip()
+            item = item_display.split() 
             detail_label.config(text=f"Country: {item[0]}\nCurrency: {item[-1]}")
             from_ = item[-1]
         else:
             detail_label.config(text="No item selected.")
         
-    # Add a listbox inside the frame
     listbox = tk.Listbox(listbox_frame, width=85, height=27, yscrollcommand=scrollbar.set)
     
     for currency in currency_data:
@@ -722,15 +654,11 @@ def to_convert_from():
     listbox.pack(side=tk.LEFT)
     scrollbar.config(command=listbox.yview)
 
-    #bind the listbox with an action
-    # Bind the click event to the show_details function
     listbox.bind("<<ListboxSelect>>", show_details)
 
-    # Label to display item details
     detail_label = tk.Label(canvas, text="", justify=tk.LEFT)
     detail_label.pack(pady=10, side="left")  
 
-    # Add a back button to return to the main phase
     back_button = tk.Button(canvas, text="Back", command=back_to_main_phase)
     back_button.pack(side="right", padx = 20)
 
@@ -741,13 +669,11 @@ def to_convert_from():
 
 #create a duplicate of the show currency phase so that we handle different event in different button clicks
 def to_convert_to():
-    # Destroy all widgets in the root window
     for widget in root.winfo_children():
         widget.destroy()
 
     global search_entry, search_button, listbox_frame, listbox, item_key
 
-    # Create a title label
     title_label = tk.Label(root, text="Countries and Currencies", font=("Arial", 16))
     title_label.pack(pady=2)
 
@@ -757,59 +683,47 @@ def to_convert_to():
     search_button = tk.Button(root, text="SEARCH", command=search)
     search_button.pack(pady=1)
 
-    # Create a new frame for the currency phase
     currency_frame = tk.Frame(root, padx=10, pady=10)
     currency_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-    # Create a canvas and scrollbar for scrolling
     canvas = tk.Canvas(currency_frame)
     canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-    # Create a frame inside the canvas to hold the listbox
     listbox_frame = tk.Frame(canvas)
     listbox_frame.pack(pady=10)
 
-    # Create a scrollbar
     scrollbar = tk.Scrollbar(listbox_frame)
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
 
-    # Function to display key-value pairs
     def show_details(event):
         global item_key, from_, to_
         selection = listbox.curselection()
         if selection:
             index = selection[0]
-            item_display = listbox.get(index).strip()  # Get the displayed string
-            item = item_display.split()  # Extract value and key from displayed string
+            item_display = listbox.get(index).strip() 
+            item = item_display.split() 
             detail_label.config(text=f"Country: {item[0]}\nCurrency: {item[-1]}")
             to_ = item[-1]
         else:
             detail_label.config(text="No item selected.")
         
-    # Add a listbox inside the frame
     listbox = tk.Listbox(listbox_frame, width=85, height=27, yscrollcommand=scrollbar.set)
-        # Use the provided data dictionary
     for currency in currency_data:
         listbox.insert(tk.END, f"{" ".join(currency_data[currency][0:])}: {currency}")
     
     listbox.pack(side=tk.LEFT)
     scrollbar.config(command=listbox.yview)
 
-    #bind the listbox with an action
-    # Bind the click event to the show_details function
     listbox.bind("<<ListboxSelect>>", show_details)
 
-    # Label to display item details
     detail_label = tk.Label(canvas, text="", justify=tk.LEFT)
     detail_label.pack(pady=10, side="left")  
 
-    # Add a back button to return to the main phase
     back_button = tk.Button(canvas, text="Back", command=back_to_main_phase)
     back_button.pack(side="right", padx = 20)
 
     apply_styles(root)
 
 
-# Start app by Creating GUI
 create_gui()
