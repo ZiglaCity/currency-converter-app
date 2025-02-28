@@ -1,2 +1,2 @@
 1. find a solution to displaying the icon at the windows title even when the user runs the app at different locations
-
+2. only check connection when the user is in the home phase so that there'll be no error when the status var is been updated in the search phase where it is not available

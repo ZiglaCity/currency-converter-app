@@ -6,3 +6,6 @@
 
 # ignore the exe file
 dist/
+
+# ignore etc
+etc/
